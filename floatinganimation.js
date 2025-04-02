@@ -1,41 +1,32 @@
-$(document).ready(function() {
-    // inicializa animação
-    animateBird();
-  });
+function obterNovaPosicao() {
+  const alturaJanela = window.innerHeight - 44;
+  const larguraJanela = window.innerWidth - 44;
   
-  function makeNewPosition() {
-    // Get viewport dimensions (remove the dimension of the div)
-    var h = $(window).height() - $('.birdFloat').height();
-    var w = $(window).width() - $('.birdFloat').width();
+  const novaAltura = Math.floor(Math.random() * alturaJanela);
+  const novaLargura = Math.floor(Math.random() * larguraJanela);
   
-    var nh = Math.floor(Math.random() * h);
-    var nw = Math.floor(Math.random() * w);
+  return [novaAltura, novaLargura];
+}
+
+function calcularVelocidade(posicaoAntiga, novaPosicao) {
+  const diferencaX = Math.abs(posicaoAntiga[1] - novaPosicao[1]);
+  const diferencaY = Math.abs(posicaoAntiga[0] - novaPosicao[0]);
+  const maiorDistancia = Math.max(diferencaX, diferencaY);
   
-    return [nh, nw];
-  }
+  const fatorVelocidade = 0.1; // Ajuste esse valor para modificar a velocidade
+  return Math.ceil(maiorDistancia / fatorVelocidade);
+}
+
+function animarIcone() {
+  const icone = document.getElementById('icone-flutuante');
+  const novaPosicao = obterNovaPosicao();
+  const posicaoAtual = [icone.offsetTop, icone.offsetLeft];
+  const velocidade = calcularVelocidade(posicaoAtual, novaPosicao);
+
+  icone.style.transition = `transform ${velocidade}ms linear`;
+  icone.style.transform = `translate(${novaPosicao[1]}px, ${novaPosicao[0]}px)`;
   
-  function animateBird() {
-    var newq = makeNewPosition();
-    var oldq = $('.birdFloat').offset();
-    var speed = calcSpeed([oldq.top, oldq.left], newq);
-  
-    $('.birdFloat').animate({
-      top: newq[0],
-      left: newq[1]
-    }, speed, function() {
-      animateBird();
-    });
-  };
-  
-  function calcSpeed(prev, next) {
-    var x = Math.abs(prev[1] - next[1]);
-    var y = Math.abs(prev[0] - next[0]);
-  
-    var greatest = x > y ? x : y;
-  
-    // modifique esse valor para modificar a velocidade da animação 
-    var speedModifier = 0.1;
-    var speed = Math.ceil(greatest / speedModifier);
-  
-    return speed;
-  }
+  setTimeout(animarIcone, velocidade); // Remove a pausa extra antes do próximo movimento
+}
+
+animarIcone(); // Inicia a animação imediatamente
